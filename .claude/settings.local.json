@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm audit *)",
+      "Bash(npm run *)",
+      "Bash(node -e \"require\\('dotenv'\\).config\\({path:'.env.local'}\\); console.log\\('URI loaded:', process.env.MONGODB_URI ? 'YES' : 'NO'\\)\")",
+      "Bash(npx tsx *)",
+      "WebFetch(domain:unsplash.com)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}, type=%{content_type}\\\\n\" \"https://5.imimg.com/data5/SELLER/Default/2024/2/388944397/EB/ES/CM/103718232/mumbai-to-nashik-cab-service-500x500.png\")",
+      "Read(//c/Users/admin/Desktop/**)",
+      "Bash(mkdir -p public)",
+      "Bash(cp landing_page.png public/landing_page.png)"
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+# Render Blueprint — deploys Ooty Trails as a single Node web service (free tier).
+# In the Render dashboard: New → Blueprint → connect this repo.
+# Set the secret env vars (marked sync: false) afterwards in the dashboard.
+services:
+  - type: web
+    name: ootygo
+    runtime: node
+    plan: free
+    region: singapore # closest free region to India; change if you prefer
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+      - key: NEXT_PUBLIC_PHONE
+        value: "9345653427"
+      - key: NEXT_PUBLIC_WHATSAPP_NUMBER
+        value: "919345653427"
+      - key: NEXT_PUBLIC_INSTAGRAM
+        sync: false
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
