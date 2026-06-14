@@ -35,7 +35,8 @@ export const PATCH = handler(async (req, { params }: { params: { id: string } })
   Object.assign(vehicle, input, { assignedDriver: input.assignedDriver ?? vehicle.assignedDriver });
   await vehicle.save();
 
-  return ok({ ...vehicle.toObject(), _id: String(vehicle._id) });
+  const { image: _img, ...rest } = vehicle.toObject();
+  return ok({ ...rest, _id: String(vehicle._id) });
 });
 
 export const DELETE = handler(async (_req, { params }: { params: { id: string } }) => {

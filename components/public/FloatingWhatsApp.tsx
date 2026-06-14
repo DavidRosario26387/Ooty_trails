@@ -4,7 +4,7 @@ import { whatsappLink } from "@/lib/constants";
 export default function FloatingWhatsApp() {
   return (
     <a
-      href={whatsappLink("Hi Ooty Trails, I'd like to book a cab in Ooty.")}
+      href={whatsappLink("Hi Ready Go, I'd like to book a cab in Ooty.")}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"

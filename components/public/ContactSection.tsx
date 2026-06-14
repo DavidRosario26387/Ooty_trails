@@ -21,7 +21,7 @@ export default function ContactSection() {
                 <p className="text-sm text-slate-600">{SITE.phone}</p>
               </div>
             </a>
-            <a href={whatsappLink("Hi Ooty Trails, I'd like to book a cab in Ooty.")} target="_blank" rel="noopener noreferrer" className="card flex items-center gap-4 p-5 transition-shadow hover:shadow-card">
+            <a href={whatsappLink("Hi Ready Go, I'd like to book a cab in Ooty.")} target="_blank" rel="noopener noreferrer" className="card flex items-center gap-4 p-5 transition-shadow hover:shadow-card">
               <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#25D366]/10 text-[#1da851]"><MessageCircle className="h-5 w-5" /></span>
               <div>
                 <p className="text-sm font-semibold text-slate-900">WhatsApp</p>

@@ -4,7 +4,7 @@ import ContactSection from "@/components/public/ContactSection";
 export const metadata: Metadata = {
   title: "Contact — Book your Ooty cab",
   description:
-    "Contact Ooty Trails to book a cab in Ooty. Call, WhatsApp or send us a message. Available 24/7 for bookings and tour planning.",
+    "Contact Ready Go to book a cab in Ooty. Call, WhatsApp or send us a message. Available 24/7 for bookings and tour planning.",
 };
 
 export default function ContactPage() {

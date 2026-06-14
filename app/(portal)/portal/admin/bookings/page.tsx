@@ -3,7 +3,7 @@
 import { useState } from "react";
 import useSWR, { mutate } from "swr";
 import {
-  Phone, MapPin, Calendar, Clock, Users, Check, X, CarFront, Flag, ClipboardList,
+  Phone, MapPin, Calendar, Clock, Users, Check, X, CarFront, Flag, ClipboardList, Package,
 } from "lucide-react";
 import { fetcher, postJSON } from "@/lib/fetcher";
 import { PageHeader, EmptyState, INR } from "@/components/portal/widgets";
@@ -18,14 +18,14 @@ interface Booking {
   phone: string;
   email?: string;
   pickup: string;
-  drop: string;
+  drop?: string;
   travelDate: string;
   travelTime: string;
   passengers: number;
-  vehiclePreference?: string;
+  packageName: string;
+  vehicleName: string;
+  fare: number;
   notes?: string;
-  estimatedDistanceKm: number;
-  estimatedFare: number;
   status: BookingStatus;
   assignedVehicle?: { _id: string; name: string; registrationNumber: string } | null;
   assignedDriver?: { _id: string; name: string; phone?: string } | null;
@@ -102,16 +102,16 @@ export default function BookingsPage() {
                   </a>
                 </div>
                 <div className="text-right">
-                  <p className="font-display text-lg font-bold text-slate-900"><INR value={b.estimatedFare} /></p>
-                  <p className="text-xs text-slate-400">{b.estimatedDistanceKm} km (est.)</p>
+                  <p className="font-display text-lg font-bold text-slate-900"><INR value={b.fare} /></p>
+                  <p className="text-xs text-slate-400">{b.vehicleName}</p>
                 </div>
               </div>
 
               <div className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2 lg:grid-cols-4">
-                <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4 text-brand-500" /> {b.pickup} → {b.drop}</span>
-                <span className="inline-flex items-center gap-1.5"><Calendar className="h-4 w-4 text-brand-500" /> {b.travelDate}</span>
-                <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4 text-brand-500" /> {b.travelTime}</span>
-                <span className="inline-flex items-center gap-1.5"><Users className="h-4 w-4 text-brand-500" /> {b.passengers} pax {b.vehiclePreference ? `· ${b.vehiclePreference}` : ""}</span>
+                <span className="inline-flex items-center gap-1.5"><Package className="h-4 w-4 text-brand-500" /> {b.packageName}</span>
+                <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4 text-brand-500" /> {b.pickup}{b.drop ? ` → ${b.drop}` : ""}</span>
+                <span className="inline-flex items-center gap-1.5"><Calendar className="h-4 w-4 text-brand-500" /> {b.travelDate} · {b.travelTime}</span>
+                <span className="inline-flex items-center gap-1.5"><Users className="h-4 w-4 text-brand-500" /> {b.passengers} pax</span>
               </div>
 
               {b.notes && <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">“{b.notes}”</p>}

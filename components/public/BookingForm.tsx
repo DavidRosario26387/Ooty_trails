@@ -1,78 +1,63 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import { useForm } from "react-hook-form";
 import {
   User, Phone, Mail, MapPin, Calendar, Clock, Users, Car, StickyNote,
-  CheckCircle2, Copy, Loader2, IndianRupee, Route,
+  CheckCircle2, Copy, Loader2, IndianRupee, Package,
 } from "lucide-react";
-import { postJSON } from "@/lib/fetcher";
-import { VEHICLE_CATEGORIES } from "@/lib/constants";
-import { whatsappLink } from "@/lib/constants";
+import { fetcher, postJSON } from "@/lib/fetcher";
+import { PACKAGES, whatsappLink } from "@/lib/constants";
+
+interface FleetVehicle {
+  id: string;
+  name: string;
+  type: string;
+  category: string;
+  seatingCapacity: number;
+  image?: string | null;
+  packagePrices: Record<string, number>;
+  status: string;
+}
 
 type FormValues = {
   customerName: string;
   phone: string;
   email?: string;
   pickup: string;
-  drop: string;
+  drop?: string;
   travelDate: string;
   travelTime: string;
   passengers: number;
-  vehiclePreference?: string;
+  packageId: string;
+  vehicleId: string;
   notes?: string;
 };
 
-interface Estimate {
-  distanceKm: number;
+interface Confirmation {
+  bookingRef: string;
+  packageName: string;
+  vehicleName: string;
   fare: number;
   currency: string;
 }
 
-interface Confirmation {
-  bookingRef: string;
-  estimatedDistanceKm: number;
-  estimatedFare: number;
-  currency: string;
-}
-
 export default function BookingForm() {
+  const { data: vehicles } = useSWR<FleetVehicle[]>("/api/fleet/status", fetcher);
   const { register, handleSubmit, watch, formState } = useForm<FormValues>({
-    defaultValues: { passengers: 2 },
+    defaultValues: { passengers: 2, packageId: "", vehicleId: "" },
   });
-  const [estimate, setEstimate] = useState<Estimate | null>(null);
-  const [estimating, setEstimating] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const pickup = watch("pickup");
-  const drop = watch("drop");
-  const vehiclePreference = watch("vehiclePreference");
-
-  // Debounced live fare estimate whenever pickup/drop/vehicle change.
-  useEffect(() => {
-    if (!pickup || !drop || pickup.trim().length < 2 || drop.trim().length < 2) {
-      setEstimate(null);
-      return;
-    }
-    let cancelled = false;
-    setEstimating(true);
-    const t = setTimeout(async () => {
-      try {
-        const data = await postJSON<Estimate>("/api/estimate", { pickup, drop, vehiclePreference });
-        if (!cancelled) setEstimate(data);
-      } catch {
-        if (!cancelled) setEstimate(null);
-      } finally {
-        if (!cancelled) setEstimating(false);
-      }
-    }, 700);
-    return () => {
-      cancelled = true;
-      clearTimeout(t);
-    };
-  }, [pickup, drop, vehiclePreference]);
+  const packageId = watch("packageId");
+  const vehicleId = watch("vehicleId");
+  const fleet = vehicles ?? [];
+  const selectedVehicle = fleet.find((v) => v.id === vehicleId);
+  const selectedPackage = PACKAGES.find((p) => p.id === packageId);
+  const price = selectedVehicle && packageId ? selectedVehicle.packagePrices?.[packageId] : undefined;
 
   async function onSubmit(values: FormValues) {
     setServerError(null);
@@ -86,7 +71,7 @@ export default function BookingForm() {
   }
 
   if (confirmation) {
-    const waMsg = `Hi Ooty Trails, I just booked a cab. My booking reference is ${confirmation.bookingRef}.`;
+    const waMsg = `Hi Ready Go, I just booked the "${confirmation.packageName}" package (${confirmation.vehicleName}). My booking reference is ${confirmation.bookingRef}.`;
     return (
       <div className="card mx-auto max-w-lg p-8 text-center">
         <CheckCircle2 className="mx-auto h-14 w-14 text-brand-500" />
@@ -100,6 +85,7 @@ export default function BookingForm() {
           <div className="mt-1 flex items-center justify-center gap-2">
             <span className="font-display text-2xl font-extrabold tracking-wider text-brand-800">{confirmation.bookingRef}</span>
             <button
+              type="button"
               onClick={() => {
                 navigator.clipboard?.writeText(confirmation.bookingRef);
                 setCopied(true);
@@ -116,21 +102,22 @@ export default function BookingForm() {
 
         <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
           <div className="rounded-xl border border-slate-100 p-3">
-            <p className="text-slate-500">Est. distance</p>
-            <p className="font-semibold text-slate-900">{confirmation.estimatedDistanceKm} km</p>
+            <p className="text-slate-500">Package</p>
+            <p className="font-semibold text-slate-900">{confirmation.packageName}</p>
+            <p className="text-xs text-slate-400">{confirmation.vehicleName}</p>
           </div>
           <div className="rounded-xl border border-slate-100 p-3">
-            <p className="text-slate-500">Est. fare</p>
-            <p className="font-semibold text-slate-900">₹{confirmation.estimatedFare}</p>
+            <p className="text-slate-500">Fixed fare</p>
+            <p className="font-semibold text-slate-900">₹{confirmation.fare.toLocaleString("en-IN")}</p>
           </div>
         </div>
-        <p className="mt-3 text-xs text-slate-400">Fare is approximate and will be confirmed by our operator.</p>
+        <p className="mt-3 text-xs text-slate-400">This is the all-inclusive package price, confirmed by our operator.</p>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <a href={whatsappLink(waMsg)} target="_blank" rel="noopener noreferrer" className="btn-primary flex-1">
             Share on WhatsApp
           </a>
-          <button onClick={() => { setConfirmation(null); setEstimate(null); }} className="btn-outline flex-1">
+          <button type="button" onClick={() => setConfirmation(null)} className="btn-outline flex-1">
             Make another booking
           </button>
         </div>
@@ -154,12 +141,30 @@ export default function BookingForm() {
           <input type="email" className="input" placeholder="you@example.com" {...register("email")} />
         </Field>
 
+        <Field label="Choose a package" icon={Package} error={formState.errors.packageId && "Please choose a package"}>
+          <select className="input" {...register("packageId", { required: true })}>
+            <option value="">Select a package…</option>
+            {PACKAGES.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="Choose a vehicle" icon={Car} error={formState.errors.vehicleId && "Please choose a vehicle"}>
+          <select className="input" {...register("vehicleId", { required: true })}>
+            <option value="">{fleet.length ? "Select a vehicle…" : "Loading vehicles…"}</option>
+            {fleet.map((v) => (
+              <option key={v.id} value={v.id}>{v.name} — {v.type} ({v.seatingCapacity} seats)</option>
+            ))}
+          </select>
+        </Field>
+
         <div className="grid gap-5 sm:grid-cols-2">
           <Field label="Pickup location" icon={MapPin} error={formState.errors.pickup && "Pickup is required"}>
-            <input className="input" placeholder="e.g. Ooty Bus Stand" {...register("pickup", { required: true })} />
+            <input className="input" placeholder="e.g. Ooty Bus Stand / hotel" {...register("pickup", { required: true })} />
           </Field>
-          <Field label="Drop location" icon={MapPin} error={formState.errors.drop && "Drop is required"}>
-            <input className="input" placeholder="e.g. Pykara Lake" {...register("drop", { required: true })} />
+          <Field label="Drop location (if any)" icon={MapPin}>
+            <input className="input" placeholder="e.g. Coimbatore Airport" {...register("drop")} />
           </Field>
         </div>
 
@@ -175,15 +180,6 @@ export default function BookingForm() {
           </Field>
         </div>
 
-        <Field label="Vehicle preference" icon={Car}>
-          <select className="input" {...register("vehiclePreference")}>
-            <option value="">Any vehicle</option>
-            {VEHICLE_CATEGORIES.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </Field>
-
         <Field label="Additional notes (optional)" icon={StickyNote}>
           <textarea rows={3} className="input resize-none" placeholder="Trip plan, luggage, child seat, etc." {...register("notes")} />
         </Field>
@@ -196,29 +192,32 @@ export default function BookingForm() {
         <p className="text-center text-xs text-slate-400">No payment needed now — we confirm your ride first.</p>
       </form>
 
-      {/* Live estimate sidebar */}
+      {/* Fixed package price sidebar */}
       <aside className="lg:col-span-1">
         <div className="card sticky top-20 p-6">
-          <h3 className="font-display text-lg font-bold text-slate-900">Fare estimate</h3>
-          <p className="mt-1 text-sm text-slate-500">Updates as you enter pickup &amp; drop.</p>
+          <h3 className="font-display text-lg font-bold text-slate-900">Your package</h3>
+          <p className="mt-1 text-sm text-slate-500">Fixed, all-inclusive price — no per-km charges.</p>
 
           <div className="mt-5 space-y-4">
-            <div className="flex items-center justify-between rounded-xl bg-slate-50 p-4">
-              <span className="flex items-center gap-2 text-sm text-slate-600"><Route className="h-4 w-4 text-brand-500" /> Distance</span>
-              <span className="font-semibold text-slate-900">
-                {estimating ? <Loader2 className="h-4 w-4 animate-spin" /> : estimate ? `${estimate.distanceKm} km` : "—"}
-              </span>
+            <div className="rounded-xl bg-slate-50 p-4">
+              <span className="flex items-center gap-2 text-sm text-slate-600"><Package className="h-4 w-4 text-brand-500" /> Package</span>
+              <p className="mt-1 font-semibold text-slate-900">{selectedPackage ? selectedPackage.name : "—"}</p>
+              {selectedPackage && <p className="text-xs text-slate-500">{selectedPackage.desc}</p>}
+            </div>
+            <div className="rounded-xl bg-slate-50 p-4">
+              <span className="flex items-center gap-2 text-sm text-slate-600"><Car className="h-4 w-4 text-brand-500" /> Vehicle</span>
+              <p className="mt-1 font-semibold text-slate-900">{selectedVehicle ? `${selectedVehicle.name} — ${selectedVehicle.type}` : "—"}</p>
             </div>
             <div className="flex items-center justify-between rounded-xl bg-brand-50 p-4">
-              <span className="flex items-center gap-2 text-sm text-brand-700"><IndianRupee className="h-4 w-4" /> Estimated fare</span>
+              <span className="flex items-center gap-2 text-sm text-brand-700"><IndianRupee className="h-4 w-4" /> Fixed fare</span>
               <span className="font-display text-xl font-bold text-brand-800">
-                {estimating ? <Loader2 className="h-4 w-4 animate-spin" /> : estimate ? `₹${estimate.fare}` : "—"}
+                {price != null ? `₹${price.toLocaleString("en-IN")}` : "—"}
               </span>
             </div>
           </div>
 
           <p className="mt-4 text-xs text-slate-400">
-            Estimates are approximate (based on typical Ooty routes) and confirmed by our operator before your trip.
+            Final fare is the package price shown above and is confirmed by our operator before your trip.
           </p>
         </div>
       </aside>

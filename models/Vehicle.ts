@@ -10,8 +10,8 @@ export interface IVehicle {
   registrationNumber: string;
   assignedDriver?: Types.ObjectId | null;
   driverPhone?: string;
-  pricePerKm: number;
-  baseFare: number;
+  // Fixed price for each package, keyed by package id (see PACKAGES).
+  packagePrices: Map<string, number>;
   image?: string;
   status: (typeof VEHICLE_STATUSES)[number];
   active: boolean;
@@ -28,8 +28,7 @@ const VehicleSchema = new Schema<IVehicle>(
     registrationNumber: { type: String, required: true, unique: true, uppercase: true, trim: true },
     assignedDriver: { type: Schema.Types.ObjectId, ref: "User", default: null },
     driverPhone: { type: String, trim: true },
-    pricePerKm: { type: Number, required: true, min: 0 },
-    baseFare: { type: Number, required: true, min: 0 },
+    packagePrices: { type: Map, of: Number, default: {} },
     image: { type: String, trim: true },
     status: { type: String, enum: VEHICLE_STATUSES, default: "available" },
     active: { type: Boolean, default: true },

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import BookingForm from "@/components/public/BookingForm";
+import PackagesPricing from "@/components/public/PackagesPricing";
 
 export const metadata: Metadata = {
-  title: "Book a Cab in Ooty — Instant fare estimate",
+  title: "Book a Cab in Ooty — Fixed package prices",
   description:
-    "Book a reliable cab in Ooty online. Enter your trip details for an instant approximate fare and get a booking reference in seconds.",
+    "Book a reliable cab in Ooty online. Choose a fixed-price sightseeing or transfer package, pick your vehicle and get a booking reference in seconds.",
 };
 
 export default function BookPage() {
@@ -15,7 +16,7 @@ export default function BookPage() {
           <p className="eyebrow text-accent-300">Book Your Ride</p>
           <h1 className="mt-2 font-display text-4xl font-extrabold sm:text-5xl">Reserve your Ooty cab</h1>
           <p className="mt-4 text-brand-50/90">
-            Fill in your trip details and we&apos;ll confirm a clean, comfortable cab with a friendly local driver.
+            Pick a fixed-price package and your vehicle, and we&apos;ll confirm a clean, comfortable cab with a friendly local driver.
           </p>
         </div>
       </section>
@@ -25,6 +26,8 @@ export default function BookPage() {
           <BookingForm />
         </div>
       </section>
+
+      <PackagesPricing />
     </>
   );
 }

@@ -33,17 +33,17 @@ export const GET = handler(async () => {
   ] = await Promise.all([
     Booking.aggregate([
       { $match: { status: "completed" } },
-      { $group: { _id: null, revenue: { $sum: "$estimatedFare" }, count: { $sum: 1 } } },
+      { $group: { _id: null, revenue: { $sum: "$fare" }, count: { $sum: 1 } } },
     ]),
     Booking.countDocuments(),
     Customer.countDocuments(),
     Booking.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
     Vehicle.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
-    Booking.find({ createdAt: { $gte: sixMonthsAgo } }).select("createdAt estimatedFare status").lean(),
+    Booking.find({ createdAt: { $gte: sixMonthsAgo } }).select("createdAt fare status").lean(),
     Customer.find({ createdAt: { $gte: sixMonthsAgo } }).select("createdAt").lean(),
     Booking.aggregate([
       { $match: { status: "completed", assignedVehicle: { $ne: null } } },
-      { $group: { _id: "$assignedVehicle", trips: { $sum: 1 }, revenue: { $sum: "$estimatedFare" } } },
+      { $group: { _id: "$assignedVehicle", trips: { $sum: 1 }, revenue: { $sum: "$fare" } } },
       { $sort: { trips: -1 } },
       { $limit: 10 },
     ]),
@@ -60,7 +60,7 @@ export const GET = handler(async () => {
     const inMonth = recentBookings.filter((b) => monthKey(new Date(b.createdAt)) === m.key);
     return {
       month: m.label,
-      revenue: inMonth.filter((b) => b.status === "completed").reduce((s, b) => s + (b.estimatedFare || 0), 0),
+      revenue: inMonth.filter((b) => b.status === "completed").reduce((s, b) => s + (b.fare || 0), 0),
       bookings: inMonth.length,
     };
   });

@@ -11,7 +11,7 @@ export default function Footer() {
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10">
               <Mountain className="h-5 w-5 text-white" />
             </span>
-            <span className="font-display text-xl font-extrabold">Ooty Trails</span>
+            <span className="font-display text-xl font-extrabold">Ready Go</span>
           </div>
           <p className="mt-4 text-sm text-brand-100/80">{SITE.description}</p>
         </div>
@@ -47,7 +47,7 @@ export default function Footer() {
             </li>
             <li className="flex items-center gap-2">
               <MessageCircle className="h-4 w-4 text-accent-300" />
-              <a href={whatsappLink("Hi Ooty Trails, I'd like to book a cab.")} className="hover:text-white" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              <a href={whatsappLink("Hi Ready Go, I'd like to book a cab.")} className="hover:text-white" target="_blank" rel="noopener noreferrer">WhatsApp</a>
             </li>
             <li className="flex items-center gap-2">
               <Instagram className="h-4 w-4 text-accent-300" />
@@ -63,7 +63,7 @@ export default function Footer() {
 
       <div className="border-t border-white/10">
         <div className="container-page flex flex-col items-center justify-between gap-2 py-5 text-xs text-brand-100/70 sm:flex-row">
-          <p>© {new Date().getFullYear()} Ooty Trails. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Ready Go. All rights reserved.</p>
           <p>
             Fleet partners? <Link href="/portal/login" className="font-semibold text-accent-300 hover:text-accent-200">Staff login</Link>
           </p>

@@ -3,17 +3,33 @@ import { Vehicle } from "@/models/Vehicle";
 import { User } from "@/models/User";
 import { vehicleSchema } from "@/lib/validation";
 import { handler, ok, parseBody, requireRole, ApiError } from "@/lib/api";
+import { toPriceMap } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
 export const GET = handler(async () => {
   await requireRole("admin");
   await connectDB();
+  // Exclude the heavy image blob; expose a URL to the dedicated image route.
   const vehicles = await Vehicle.find()
+    .select("-image")
     .populate("assignedDriver", "name phone")
     .sort({ createdAt: -1 })
     .lean();
-  return ok(vehicles.map((v) => ({ ...v, _id: String(v._id) })));
+  const withImage = new Set(
+    (await Vehicle.find({ image: { $exists: true, $nin: [null, ""] } }).select("_id").lean())
+      .map((v) => String(v._id)),
+  );
+  return ok(
+    vehicles.map((v) => ({
+      ...v,
+      _id: String(v._id),
+      packagePrices: toPriceMap(v.packagePrices),
+      image: withImage.has(String(v._id))
+        ? `/api/vehicles/${String(v._id)}/image?v=${new Date(v.updatedAt).getTime()}`
+        : "",
+    })),
+  );
 });
 
 export const POST = handler(async (req) => {
@@ -34,5 +50,6 @@ export const POST = handler(async (req) => {
     await User.findByIdAndUpdate(input.assignedDriver, { assignedVehicle: vehicle._id });
   }
 
-  return ok({ ...vehicle.toObject(), _id: String(vehicle._id) }, { status: 201 });
+  const { image: _img, ...rest } = vehicle.toObject();
+  return ok({ ...rest, _id: String(vehicle._id) }, { status: 201 });
 });

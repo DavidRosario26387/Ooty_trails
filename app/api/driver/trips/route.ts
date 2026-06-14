@@ -17,11 +17,10 @@ export const GET = handler(async () => {
     .limit(200)
     .lean();
 
-  const totalEarnings = trips.reduce((s, t) => s + (t.estimatedFare || 0), 0);
-  const totalKm = trips.reduce((s, t) => s + (t.estimatedDistanceKm || 0), 0);
+  const totalEarnings = trips.reduce((s, t) => s + (t.fare || 0), 0);
 
   return ok({
     trips: trips.map((t) => ({ ...t, _id: String(t._id) })),
-    summary: { count: trips.length, totalEarnings, totalKm: Math.round(totalKm) },
+    summary: { count: trips.length, totalEarnings },
   });
 });

@@ -26,10 +26,10 @@ interface BookingRow {
   bookingRef: string;
   customerName: string;
   pickup: string;
-  drop: string;
+  drop?: string;
   travelDate: string;
   status: BookingStatus;
-  estimatedFare: number;
+  fare: number;
 }
 
 export default function AdminDashboard() {
@@ -74,8 +74,8 @@ export default function AdminDashboard() {
                     <tr key={b._id}>
                       <td className="py-3 font-mono text-xs font-semibold text-brand-700">{b.bookingRef}</td>
                       <td className="py-3 text-slate-700">{b.customerName}</td>
-                      <td className="py-3 text-slate-500">{b.pickup} → {b.drop}</td>
-                      <td className="py-3 font-medium text-slate-700"><INR value={b.estimatedFare} /></td>
+                      <td className="py-3 text-slate-500">{b.pickup}{b.drop ? ` → ${b.drop}` : ""}</td>
+                      <td className="py-3 font-medium text-slate-700"><INR value={b.fare} /></td>
                       <td className="py-3"><BookingStatusBadge status={b.status} /></td>
                     </tr>
                   ))}

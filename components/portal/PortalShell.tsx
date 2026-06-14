@@ -40,7 +40,7 @@ export default function PortalShell({
         </span>
         <div>
           <p className="font-display text-base font-extrabold leading-none">
-            <span className="text-brand-600">Ooty</span><span className="text-accent-500"> Trails</span>
+            <span className="text-brand-600">Ready</span><span className="text-accent-500"> Go</span>
           </p>
           <p className="text-[11px] text-slate-400">{title}</p>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR, { mutate } from "swr";
-import { Car, Users, IndianRupee, MapPin, Calendar, Clock, Phone, ClipboardList, AlertCircle } from "lucide-react";
+import { Car, Users, MapPin, Calendar, Clock, Phone, ClipboardList, AlertCircle } from "lucide-react";
 import { fetcher } from "@/lib/fetcher";
 import { PageHeader, CardPanel, EmptyState, INR } from "@/components/portal/widgets";
 import { VehicleStatusBadge, BookingStatusBadge } from "@/components/ui/StatusBadge";
@@ -13,12 +13,12 @@ interface DriverData {
   driver: { name: string } | null;
   vehicle: {
     _id: string; name: string; type: string; category: string; registrationNumber: string;
-    seatingCapacity: number; baseFare: number; pricePerKm: number; image?: string; status: VehicleStatus;
+    seatingCapacity: number; image?: string; status: VehicleStatus;
   } | null;
   currentBookings: {
     _id: string; bookingRef: string; customerName: string; phone: string;
-    pickup: string; drop: string; travelDate: string; travelTime: string;
-    passengers: number; estimatedFare: number; status: BookingStatus;
+    pickup: string; drop?: string; travelDate: string; travelTime: string;
+    passengers: number; packageName: string; fare: number; status: BookingStatus;
   }[];
 }
 
@@ -72,8 +72,6 @@ export default function DriverHome() {
               <div className="mt-3 grid grid-cols-2 gap-2 text-sm text-slate-600">
                 <span className="inline-flex items-center gap-1.5"><Car className="h-4 w-4 text-slate-400" /> {vehicle.registrationNumber}</span>
                 <span className="inline-flex items-center gap-1.5"><Users className="h-4 w-4 text-slate-400" /> {vehicle.seatingCapacity} seats</span>
-                <span className="inline-flex items-center gap-1.5"><IndianRupee className="h-4 w-4 text-slate-400" /> ₹{vehicle.baseFare} base</span>
-                <span className="inline-flex items-center gap-1.5"><IndianRupee className="h-4 w-4 text-slate-400" /> ₹{vehicle.pricePerKm}/km</span>
               </div>
             </div>
           </div>
@@ -100,11 +98,11 @@ export default function DriverHome() {
                   </div>
                   <p className="mt-1 font-semibold text-slate-800">{b.customerName}</p>
                   <div className="mt-2 space-y-1 text-xs text-slate-500">
-                    <p className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {b.pickup} → {b.drop}</p>
+                    <p className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {b.pickup}{b.drop ? ` → ${b.drop}` : ""}</p>
                     <p className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {b.travelDate} <Clock className="ml-1 h-3.5 w-3.5" /> {b.travelTime}</p>
                     <a href={`tel:${b.phone}`} className="flex items-center gap-1.5 hover:text-brand-600"><Phone className="h-3.5 w-3.5" /> {b.phone}</a>
                   </div>
-                  <p className="mt-2 text-sm font-semibold text-slate-700"><INR value={b.estimatedFare} /> · {b.passengers} pax</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-700"><INR value={b.fare} /> · {b.packageName} · {b.passengers} pax</p>
                 </div>
               ))}
             </div>

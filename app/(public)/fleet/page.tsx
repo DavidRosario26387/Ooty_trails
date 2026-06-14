@@ -3,9 +3,9 @@ import FleetAvailability from "@/components/public/FleetAvailability";
 import CTASection from "@/components/public/CTASection";
 
 export const metadata: Metadata = {
-  title: "Live Fleet Availability — Ooty Trails cabs",
+  title: "Live Fleet Availability — Ready Go cabs",
   description:
-    "Check the live availability of Ooty Trails' cab fleet in Ooty. See which vehicles are available, on trip or busy in real time before you book.",
+    "Check the live availability of Ready Go's cab fleet in Ooty. See which vehicles are available, on trip or busy in real time before you book.",
 };
 
 export default function FleetPage() {

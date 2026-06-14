@@ -1,7 +1,7 @@
 // Centralized constants shared across the app.
 
 export const SITE = {
-  name: "Ooty Trails",
+  name: "Ready Go",
   tagline: "Explore Ooty with Ease",
   description:
     "Reliable, transparent and tourist-friendly cab service in Ooty. Book local sightseeing, airport transfers, tea-estate tours and family trips with a trusted family-run fleet.",
@@ -57,6 +57,37 @@ export type VehicleCategory = (typeof VEHICLE_CATEGORIES)[number];
 
 export const USER_ROLES = ["admin", "driver"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
+
+// ── Fixed trip packages ────────────────────────────────────────
+// Pricing is package-based (not distance-based). Packages are a fixed set;
+// the *price* for each package is set per vehicle by the admin (see the
+// Vehicle model's `packagePrices`), so adding a vehicle means entering a price
+// for every package below.
+export const PACKAGES = [
+  { id: "ooty", name: "Ooty Sightseeing", desc: "Full-day local Ooty sightseeing." },
+  { id: "coonoor", name: "Coonoor", desc: "Coonoor sightseeing trip." },
+  { id: "pykara", name: "Pykara", desc: "Pykara lake, falls & waterfalls." },
+  { id: "pykara-mudumalai", name: "Pykara + Mudumalai", desc: "Pykara with Mudumalai wildlife sanctuary." },
+  { id: "ooty-avalanche", name: "Ooty + Avalanche", desc: "Ooty sightseeing with Avalanche lake." },
+  { id: "ooty-cbe-railway", name: "Ooty ⇄ Coimbatore Railway Station", desc: "Transfer either way — pickup or drop." },
+  { id: "ooty-cbe-airport", name: "Ooty ⇄ Coimbatore Airport", desc: "Transfer either way — pickup or drop." },
+  { id: "inside-ooty", name: "Inside Ooty (Point to Point)", desc: "One-way local drop within Ooty town." },
+] as const;
+export type PackageId = (typeof PACKAGES)[number]["id"];
+
+// Zod-friendly tuple of ids for enum validation.
+export const PACKAGE_IDS = PACKAGES.map((p) => p.id) as [PackageId, ...PackageId[]];
+
+export function getPackage(id: string) {
+  return PACKAGES.find((p) => p.id === id);
+}
+
+/** Normalize a stored packagePrices value (Mongoose Map or lean object) to a plain object. */
+export function toPriceMap(prices: unknown): Record<string, number> {
+  if (!prices) return {};
+  if (prices instanceof Map) return Object.fromEntries(prices) as Record<string, number>;
+  return prices as Record<string, number>;
+}
 
 // Default fare assumptions used when no specific vehicle is selected yet.
 export const DEFAULT_FARE = {

@@ -45,7 +45,7 @@ Built as a **single Next.js 14 app** so it deploys end-to-end on **free tiers**
 | Validation   | Zod + react-hook-form                             |
 | Charts       | Recharts                                          |
 | Realtime     | Lightweight client polling (SWR)                  |
-| Maps/Distance| Free fallback (curated routes + OpenStreetMap) — Google Maps optional |
+| Pricing      | Fixed per-package fares (car vs Xylo) — see `lib/constants.ts` |
 
 ---
 
@@ -85,12 +85,11 @@ After seeding, log in at **/portal/login**:
 | `NEXT_PUBLIC_PHONE`          | ➖       | Business phone shown on the site |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER`| ➖       | WhatsApp number incl. country code (e.g. `91…`) |
 | `NEXT_PUBLIC_INSTAGRAM`      | ➖       | Instagram profile URL |
-| `GOOGLE_MAPS_API_KEY`        | ➖       | Optional — enables accurate Google road distances |
 | `ADMIN_SEED_EMAIL`           | ➖       | Admin email created by the seed script |
 | `ADMIN_SEED_PASSWORD`        | ➖       | Admin password created by the seed script |
 
-> Distance/fare is **best-effort & approximate** by design. Without a Google key it uses a curated
-> table of common Ooty routes + free OpenStreetMap geocoding; the operator confirms the final fare.
+> Pricing is **fixed per package**. Each package has a set fare for the car (Etios) and the SUV (Xylo),
+> defined in `lib/constants.ts` (`PACKAGES`); the operator confirms the booking before the trip.
 
 ---
 
@@ -164,7 +163,7 @@ render.yaml     Render blueprint
   `/api/(admin|driver)` at the edge; route handlers re-check roles (defense in depth).
 - **Realtime availability:** drivers/admin write status to MongoDB; public pages poll
   `/api/fleet/status` every 15s — simple, free, no WebSockets.
-- **Fare engine:** `lib/distance.ts` → Google (if key) → curated Ooty routes → OSM geocode+Haversine → fallback.
+- **Fare engine:** fixed package pricing — `PACKAGES` in `lib/constants.ts`; the booking API applies the package + vehicle fare server-side.
 
 ---
 

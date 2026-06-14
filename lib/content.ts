@@ -41,7 +41,7 @@ export const SERVICES = [
 
 export const WHY_US = [
   { icon: "ShieldCheck", title: "Safe Rides", desc: "Well-maintained vehicles and verified, experienced drivers." },
-  { icon: "BadgeIndianRupee", title: "Transparent Pricing", desc: "Clear per-km rates and base fares — no surprises." },
+  { icon: "BadgeIndianRupee", title: "Transparent Pricing", desc: "Fixed package prices shared upfront — no per-km surprises." },
   { icon: "Sparkles", title: "Clean Cars", desc: "Sanitised, comfortable, air-conditioned vehicles." },
   { icon: "Clock", title: "On-Time Service", desc: "Punctual pickups so you never miss a moment." },
   { icon: "MapPinned", title: "Local Experts", desc: "Drivers who know every hill road and hidden gem." },
@@ -155,7 +155,7 @@ export const TESTIMONIALS = [
     name: "The Mehtas",
     from: "Mumbai",
     quote:
-      "Did a full Nilgiris tour over two days. Pykara and Avalanche were magical. Highly recommend Ooty Trails for families!",
+      "Did a full Nilgiris tour over two days. Pykara and Avalanche were magical. Highly recommend Ready Go for families!",
     placeholder: "Replace with photo of customer family the Mehtas",
   },
 ] as const;

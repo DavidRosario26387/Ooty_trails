@@ -42,7 +42,7 @@ function LoginInner() {
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15">
             <Mountain className="h-6 w-6" />
           </span>
-          <span className="font-display text-2xl font-extrabold">Ooty Trails</span>
+          <span className="font-display text-2xl font-extrabold">Ready Go</span>
         </Link>
 
         <div className="card p-8">

@@ -3,9 +3,8 @@ import { Booking, generateBookingRef } from "@/models/Booking";
 import { Customer } from "@/models/Customer";
 import { Vehicle } from "@/models/Vehicle";
 import { bookingSchema } from "@/lib/validation";
-import { estimateDistance, estimateFare } from "@/lib/distance";
-import { handler, ok, parseBody } from "@/lib/api";
-import { DEFAULT_FARE } from "@/lib/constants";
+import { handler, ok, parseBody, ApiError } from "@/lib/api";
+import { DEFAULT_FARE, getPackage, toPriceMap } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -13,16 +12,17 @@ export const POST = handler(async (req) => {
   const input = await parseBody(req, bookingSchema);
   await connectDB();
 
-  // Estimate distance + fare server-side (don't trust client values).
-  const { distanceKm } = await estimateDistance(input.pickup, input.drop);
-  let rates = { baseFare: DEFAULT_FARE.baseFare, pricePerKm: DEFAULT_FARE.pricePerKm };
-  if (input.vehiclePreference) {
-    const v = await Vehicle.findOne({ category: input.vehiclePreference, active: true })
-      .select("baseFare pricePerKm")
-      .lean();
-    if (v) rates = { baseFare: v.baseFare, pricePerKm: v.pricePerKm };
-  }
-  const estimatedFare = estimateFare(distanceKm, rates);
+  // Resolve the fixed fare server-side from the chosen vehicle's package price.
+  const pkg = getPackage(input.packageId);
+  if (!pkg) throw new ApiError("Unknown package selected", 400);
+
+  const vehicle = await Vehicle.findOne({ _id: input.vehicleId, active: true })
+    .select("name packagePrices")
+    .lean();
+  if (!vehicle) throw new ApiError("Selected vehicle is not available", 400);
+
+  const fare = toPriceMap(vehicle.packagePrices)[input.packageId];
+  if (fare == null) throw new ApiError("This vehicle has no price for the selected package", 400);
 
   // Generate a unique booking reference (retry on the rare collision).
   let bookingRef = generateBookingRef();
@@ -34,9 +34,11 @@ export const POST = handler(async (req) => {
   const booking = await Booking.create({
     ...input,
     email: input.email || undefined,
+    drop: input.drop || undefined,
     bookingRef,
-    estimatedDistanceKm: distanceKm,
-    estimatedFare,
+    packageName: pkg.name,
+    vehicleName: vehicle.name,
+    fare,
     status: "new",
   });
 
@@ -53,8 +55,9 @@ export const POST = handler(async (req) => {
   return ok(
     {
       bookingRef: booking.bookingRef,
-      estimatedDistanceKm: distanceKm,
-      estimatedFare,
+      packageName: pkg.name,
+      vehicleName: vehicle.name,
+      fare,
       currency: DEFAULT_FARE.currency,
     },
     { status: 201 },

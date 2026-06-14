@@ -23,13 +23,13 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/90 backdrop-blur">
       <nav className="container-page flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          {/* Replace with image of Ooty Trails logo */}
+          {/* Replace with image of Ready Go logo */}
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-white">
             <Mountain className="h-5 w-5" />
           </span>
           <span className="font-display text-xl font-extrabold tracking-tight">
-            <span className="text-brand-600">Ooty</span>
-            <span className="text-accent-500"> Trails</span>
+            <span className="text-brand-600">Ready</span>
+            <span className="text-accent-500"> Go</span>
           </span>
         </Link>
 

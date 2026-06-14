@@ -31,7 +31,7 @@ export default function Hero() {
               Book Your Ride
             </Link>
             <a
-              href={whatsappLink("Hi Ooty Trails, I'd like to book a cab in Ooty.")}
+              href={whatsappLink("Hi Ready Go, I'd like to book a cab in Ooty.")}
               target="_blank"
               rel="noopener noreferrer"
               className="btn bg-white text-brand-700 hover:bg-brand-50"

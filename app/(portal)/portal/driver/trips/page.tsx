@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import { Route, IndianRupee, MapPin, History } from "lucide-react";
+import { IndianRupee, MapPin, History, Package } from "lucide-react";
 import { fetcher } from "@/lib/fetcher";
 import { PageHeader, MetricCard, EmptyState, INR } from "@/components/portal/widgets";
 
@@ -10,15 +10,16 @@ interface Trip {
   bookingRef: string;
   customerName: string;
   pickup: string;
-  drop: string;
+  drop?: string;
   travelDate: string;
-  estimatedDistanceKm: number;
-  estimatedFare: number;
+  packageName: string;
+  vehicleName: string;
+  fare: number;
   completedAt?: string;
 }
 interface TripsData {
   trips: Trip[];
-  summary: { count: number; totalEarnings: number; totalKm: number };
+  summary: { count: number; totalEarnings: number };
 }
 
 export default function DriverTrips() {
@@ -32,10 +33,9 @@ export default function DriverTrips() {
     <>
       <PageHeader title="Trip History" subtitle="Your completed ferries and earnings." />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         <MetricCard label="Completed trips" value={data.summary.count} icon={History} tone="brand" />
-        <MetricCard label="Total distance" value={`${data.summary.totalKm} km`} icon={Route} tone="blue" />
-        <MetricCard label="Total earnings (est.)" value={`₹${data.summary.totalEarnings.toLocaleString("en-IN")}`} icon={IndianRupee} tone="accent" />
+        <MetricCard label="Total earnings" value={`₹${data.summary.totalEarnings.toLocaleString("en-IN")}`} icon={IndianRupee} tone="accent" />
       </div>
 
       <div className="mt-6">
@@ -49,7 +49,7 @@ export default function DriverTrips() {
                   <th className="px-5 py-3">Ref</th>
                   <th className="px-5 py-3">Customer</th>
                   <th className="px-5 py-3">Route</th>
-                  <th className="px-5 py-3">Distance</th>
+                  <th className="px-5 py-3">Package</th>
                   <th className="px-5 py-3">Fare</th>
                   <th className="px-5 py-3">Completed</th>
                 </tr>
@@ -59,9 +59,9 @@ export default function DriverTrips() {
                   <tr key={t._id} className="hover:bg-slate-50">
                     <td className="px-5 py-3 font-mono text-xs font-semibold text-brand-700">{t.bookingRef}</td>
                     <td className="px-5 py-3 text-slate-700">{t.customerName}</td>
-                    <td className="px-5 py-3 text-slate-500"><span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {t.pickup} → {t.drop}</span></td>
-                    <td className="px-5 py-3 text-slate-600">{t.estimatedDistanceKm} km</td>
-                    <td className="px-5 py-3 font-medium text-slate-700"><INR value={t.estimatedFare} /></td>
+                    <td className="px-5 py-3 text-slate-500"><span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {t.pickup}{t.drop ? ` → ${t.drop}` : ""}</span></td>
+                    <td className="px-5 py-3 text-slate-600"><span className="inline-flex items-center gap-1"><Package className="h-3.5 w-3.5" /> {t.packageName}</span></td>
+                    <td className="px-5 py-3 font-medium text-slate-700"><INR value={t.fare} /></td>
                     <td className="px-5 py-3 text-slate-500">{t.completedAt ? new Date(t.completedAt).toLocaleDateString("en-IN") : "—"}</td>
                   </tr>
                 ))}

@@ -8,14 +8,16 @@ export interface IBooking {
   phone: string;
   email?: string;
   pickup: string;
-  drop: string;
+  drop?: string;
   travelDate: string; // ISO date (YYYY-MM-DD)
   travelTime: string; // HH:mm
   passengers: number;
-  vehiclePreference?: string;
+  packageId: string;
+  packageName: string; // snapshot of the package name at booking time
+  vehicleId: Types.ObjectId; // the vehicle the customer chose (sets the price)
+  vehicleName: string; // snapshot of the vehicle name at booking time
+  fare: number; // fixed package price for the chosen vehicle
   notes?: string;
-  estimatedDistanceKm: number;
-  estimatedFare: number;
   status: (typeof BOOKING_STATUSES)[number];
   assignedVehicle?: Types.ObjectId | null;
   assignedDriver?: Types.ObjectId | null;
@@ -31,14 +33,16 @@ const BookingSchema = new Schema<IBooking>(
     phone: { type: String, required: true, trim: true },
     email: { type: String, trim: true, lowercase: true },
     pickup: { type: String, required: true, trim: true },
-    drop: { type: String, required: true, trim: true },
+    drop: { type: String, trim: true },
     travelDate: { type: String, required: true },
     travelTime: { type: String, required: true },
     passengers: { type: Number, required: true, min: 1 },
-    vehiclePreference: { type: String, trim: true },
+    packageId: { type: String, required: true, trim: true },
+    packageName: { type: String, required: true, trim: true },
+    vehicleId: { type: Schema.Types.ObjectId, ref: "Vehicle", required: true },
+    vehicleName: { type: String, required: true, trim: true },
+    fare: { type: Number, required: true, min: 0 },
     notes: { type: String, trim: true },
-    estimatedDistanceKm: { type: Number, default: 0 },
-    estimatedFare: { type: Number, default: 0 },
     status: { type: String, enum: BOOKING_STATUSES, default: "new", index: true },
     assignedVehicle: { type: Schema.Types.ObjectId, ref: "Vehicle", default: null },
     assignedDriver: { type: Schema.Types.ObjectId, ref: "User", default: null },
